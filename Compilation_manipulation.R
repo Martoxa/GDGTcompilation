@@ -41,12 +41,14 @@ ggplot(mDATA[mDATA$Type!="Bone"&mDATA$Type!="Groundwater",],aes(variable,value))
 #different references.The output "duplicates" is a list where each object in the 
 #list has the name of the Tag for the samples identified with duplicates, and 
 #the object contains a vector with the tags of the samples that have the same 
-#geohash but different reference.I should work on a fix where duplicates are
-#removed from the list so as to not have the opposite match.
+#geohash but different reference. The tag of all samples identified as 
+#duplicates are stored in the "exclude" vector, and they are skipped.
 
 duplicates<-list()
+exclude<-NULL
 for (i in 1:dim(DATA)[1]) {
   sample<-DATA$Tag[i]
+  if(sample %in% exclude){next}
   sameLoc<-DATA$Geohash[i]==DATA$Geohash
   DuplicateIndx<-which(DATA$Citation.No.[i] != DATA[sameLoc,27])
   DupCandidates<-DATA[sameLoc,29]
@@ -56,5 +58,6 @@ for (i in 1:dim(DATA)[1]) {
     duplicates[[j]]<-DupCandidates;
     names(duplicates)[j]<-sample
   }
+  exclude<-c(exclude,DupCandidates)
 }
 
